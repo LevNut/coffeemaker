@@ -293,7 +293,7 @@ public class CoffeeMakerTest {
 	}
 
 	/**
-	 * Test checking the spent ingredients
+	 * Checking the amount of spent ingredients
 	 */
 	@Test
 	public void testCheckIngredient() {
