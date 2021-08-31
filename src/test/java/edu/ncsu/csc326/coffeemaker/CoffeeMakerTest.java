@@ -136,6 +136,15 @@ public class CoffeeMakerTest {
 	}
 
 	/**
+	 * Test adding same recipe
+	 */
+	@Test
+	public void testAddSameRecipe() {
+		assertTrue(coffeeMaker.addRecipe(recipe1));
+		assertFalse(coffeeMaker.addRecipe(recipe1));
+	}
+
+	/**
 	 * Test deleting a recipe and check whether is it null
 	 */
 	@Test
@@ -147,6 +156,16 @@ public class CoffeeMakerTest {
 		assertNull(coffeeMaker.getRecipes()[0]);
 	}
 
+
+	/**
+	 * Test deleting non-existed recipe
+	 */
+	@Test
+	public void testDeleteNonExistedRecipe() {
+		assertNull(coffeeMaker.deleteRecipe(0));
+	}
+
+
 	/**
 	 * Test editing a recipe2 using recipe1
 	 */
@@ -156,6 +175,15 @@ public class CoffeeMakerTest {
 		coffeeMaker.addRecipe(recipe2);
 		coffeeMaker.editRecipe(1, recipe1);
 		assertEquals(coffeeMaker.getRecipes()[0].getName(), coffeeMaker.getRecipes()[1].getName());
+	}
+
+
+	/**
+	 * Test editing non-existed recipe
+	 */
+	@Test
+	public void testEditingNonExistedRecipe() {
+		assertNull(coffeeMaker.editRecipe(0, recipe3));
 	}
 
 
@@ -187,18 +215,48 @@ public class CoffeeMakerTest {
 	 * 		to a positive integer.
 	 */
 	@Test(expected = InventoryException.class)
-	public void testAddInventoryByNegativeInteger() throws InventoryException {
+	public void testAddInventoryByNegativeCoffeeInteger() throws InventoryException {
 		coffeeMaker.addInventory("-5","0","0","0");
 		assertEquals("Coffee: 10\nMilk: 15\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
+	}
 
+
+	/**
+	 * Test adding negative integer setup in inventory
+	 * @throws InventoryException  if there was an error parsing the quantity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryByNegativeMilkInteger() throws InventoryException {
 		coffeeMaker.addInventory("0","-5","0","0");
-		assertEquals("Coffee: 10\nMilk: 10\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
+		assertEquals("Coffee: 15\nMilk: 10\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
 
+	}
+
+
+	/**
+	 * Test adding negative integer setup in inventory
+	 * @throws InventoryException  if there was an error parsing the quantity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryByNegativeSugarInteger() throws InventoryException {
 		coffeeMaker.addInventory("0","0","-5","0");
-		assertEquals("Coffee: 10\nMilk: 10\nSugar: 10\nChocolate: 15\n", coffeeMaker.checkInventory());
+		assertEquals("Coffee: 15\nMilk: 15\nSugar: 10\nChocolate: 15\n", coffeeMaker.checkInventory());
 
+	}
+
+
+	/**
+	 * Test adding negative integer setup in inventory
+	 * @throws InventoryException  if there was an error parsing the quantity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryByNegativeChocolateInteger() throws InventoryException {
 		coffeeMaker.addInventory("0","0","0","-5");
-		assertEquals("Coffee: 10\nMilk: 10\nSugar: 10\nChocolate: 10\n", coffeeMaker.checkInventory());
+		assertEquals("Coffee: 15\nMilk: 15\nSugar: 15\nChocolate: 10\n", coffeeMaker.checkInventory());
+
 	}
 
 
@@ -213,20 +271,24 @@ public class CoffeeMakerTest {
 		assertEquals("Coffee: 15test\nMilk: 15\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
 	}
 
+
 	/**
 	 * Test the default purchasing the beverage
 	 */
 	@Test
 	public void testPurchaseBeverage() {
-		coffeeMaker.addRecipe(recipe2);
-		coffeeMaker.addRecipe(recipe3);
 		coffeeMaker.addRecipe(recipe4);
-		// 75 100 65
-		assertEquals(coffeeMaker.makeCoffee(0, 0), 0);
-		// coffeeMaker.makeCoffee(0, -10);
-		coffeeMaker.makeCoffee(0, 65);
+		assertEquals(coffeeMaker.makeCoffee(0, 65), 0);
 
+	}
 
+	/**
+	 * Test the negative purchasing the beverage
+	 */
+	@Test
+	public void testPurchaseBeverageByNegativeInteger() {
+		coffeeMaker.addRecipe(recipe3);
+		assertEquals(coffeeMaker.makeCoffee(0, -100), -100);
 
 	}
 
