@@ -95,33 +95,6 @@ public class CoffeeMakerTest {
 	}
 
 
-	/**
-	 * Given a coffee maker with the default inventory
-	 * When we add inventory with malformed quantities (i.e., a negative
-	 * quantity and a non-numeric string)
-	 * Then we get an inventory exception
-	 *
-	 * @throws InventoryException  if there was an error parsing the quanity
-	 * 		to a positive integer.
-	 */
-	@Test(expected = InventoryException.class)
-	public void testAddInventoryException() throws InventoryException {
-		coffeeMaker.addInventory("4", "-1", "asdf", "3");
-	}
-
-	/**
-	 * Given a coffee maker with one valid recipe
-	 * When we make coffee, selecting the valid recipe and paying more than
-	 * 		the coffee costs
-	 * Then we get the correct change back.
-	 */
-	@Test
-	public void testMakeCoffee() {
-		coffeeMaker.addRecipe(recipe1);
-		assertEquals(25, coffeeMaker.makeCoffee(0, 75));
-	}
-
-
 	// ------------------------------------------------------------------------------------
 
 	/**
@@ -182,7 +155,7 @@ public class CoffeeMakerTest {
 	 * Test editing non-existed recipe
 	 */
 	@Test
-	public void testEditingNonExistedRecipe() {
+	public void testEditNonExistedRecipe() {
 		assertNull(coffeeMaker.editRecipe(0, recipe3));
 	}
 
@@ -273,22 +246,36 @@ public class CoffeeMakerTest {
 
 
 	/**
-	 * Test the default purchasing the beverage
+	 * Given a coffee maker with one valid recipe
+	 * When we make coffee, selecting the valid recipe and paying more than
+	 * 		the coffee costs
+	 * Then we get the correct change back.
 	 */
 	@Test
-	public void testPurchaseBeverage() {
-		coffeeMaker.addRecipe(recipe4);
-		assertEquals(coffeeMaker.makeCoffee(0, 65), 0);
-
+	public void testMakeCoffee() {
+		coffeeMaker.addRecipe(recipe1);
+		assertEquals(25, coffeeMaker.makeCoffee(0, 75));
 	}
+
 
 	/**
 	 * Test the negative purchasing the beverage
 	 */
-	@Test
-	public void testPurchaseBeverageByNegativeInteger() {
+	@Test (expected = Exception.class)
+	public void testMakeCoffeeByNegativeInteger() {
 		coffeeMaker.addRecipe(recipe3);
-		assertEquals(coffeeMaker.makeCoffee(0, -100), -100);
+		coffeeMaker.makeCoffee(0, -100);
+
+	}
+
+
+	/**
+	 * Test whether the given money is acceptable
+	 */
+	@Test
+	public void testMakeCoffeeWithoutRightAmountOfMoney() {
+		coffeeMaker.addRecipe(recipe2);
+		assertEquals(coffeeMaker.makeCoffee(0, 50), 50);
 
 	}
 
