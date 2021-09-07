@@ -261,7 +261,7 @@ public class CoffeeMakerTest {
 	 * 		to a positive integer.
 	 */
 	@Test(expected = InventoryException.class)
-	public void testAddInventoryByMilkString() throws InventoryException {
+	public void testAddInventoryMilkByString() throws InventoryException {
 		coffeeMaker.addInventory("0","test","0","0");
 		assertEquals("Coffee: 15test\nMilk: 15\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
 	}
