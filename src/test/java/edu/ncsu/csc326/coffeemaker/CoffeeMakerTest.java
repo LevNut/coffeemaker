@@ -37,7 +37,6 @@ public class CoffeeMakerTest {
 	 * The object under test.
 	 */
 	private CoffeeMaker coffeeMaker;
-	private Inventory inventory;
 
 	// Sample recipes to use in testing.
 	private Recipe recipe1;
@@ -92,6 +91,19 @@ public class CoffeeMakerTest {
 		recipe4.setAmtSugar("1");
 		recipe4.setPrice("65");
 
+
+
+	}
+	private static Recipe createRecipe(String name, String amtChocolate, String amtCoffee, String amtMilk, String amtSugar, String price) throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setName(name);
+		recipe.setAmtChocolate(amtChocolate);
+		recipe.setAmtCoffee(amtCoffee);
+		recipe.setAmtMilk(amtMilk);
+		recipe.setAmtSugar(amtSugar);
+		recipe.setPrice(price);
+
+		return recipe;
 	}
 
 
@@ -203,7 +215,6 @@ public class CoffeeMakerTest {
 	public void testAddInventoryByNegativeMilkInteger() throws InventoryException {
 		coffeeMaker.addInventory("0","-5","0","0");
 		assertEquals("Coffee: 15\nMilk: 10\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
-
 	}
 
 
@@ -216,7 +227,6 @@ public class CoffeeMakerTest {
 	public void testAddInventoryByNegativeSugarInteger() throws InventoryException {
 		coffeeMaker.addInventory("0","0","-5","0");
 		assertEquals("Coffee: 15\nMilk: 15\nSugar: 10\nChocolate: 15\n", coffeeMaker.checkInventory());
-
 	}
 
 
@@ -239,11 +249,44 @@ public class CoffeeMakerTest {
 	 * 		to a positive integer.
 	 */
 	@Test(expected = InventoryException.class)
-	public void testAddInventoryByString() throws InventoryException {
+	public void testAddInventoryCoffeeByString() throws InventoryException {
 		coffeeMaker.addInventory("test","0","0","0");
 		assertEquals("Coffee: 15test\nMilk: 15\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
 	}
 
+
+	/**
+	 * Test adding string to the setup in inventory
+	 * @throws InventoryException  if there was an error parsing the quantity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryByMilkString() throws InventoryException {
+		coffeeMaker.addInventory("0","test","0","0");
+		assertEquals("Coffee: 15test\nMilk: 15\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
+	}
+
+	/**
+	 * Test adding string to the setup in inventory
+	 * @throws InventoryException  if there was an error parsing the quantity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventorySugarByString() throws InventoryException {
+		coffeeMaker.addInventory("0","0","test","0");
+		assertEquals("Coffee: 15test\nMilk: 15\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
+	}
+
+	/**
+	 * Test adding string to the setup in inventory
+	 * @throws InventoryException  if there was an error parsing the quantity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryChocolateByString() throws InventoryException {
+		coffeeMaker.addInventory("0","0","0","test");
+		assertEquals("Coffee: 15test\nMilk: 15\nSugar: 15\nChocolate: 15\n", coffeeMaker.checkInventory());
+	}
 
 	/**
 	 * Given a coffee maker with one valid recipe
@@ -257,7 +300,6 @@ public class CoffeeMakerTest {
 		assertEquals(25, coffeeMaker.makeCoffee(0, 75));
 	}
 
-
 	/**
 	 * Test the negative purchasing the beverage
 	 */
@@ -265,9 +307,7 @@ public class CoffeeMakerTest {
 	public void testMakeCoffeeByNegativeInteger() {
 		coffeeMaker.addRecipe(recipe3);
 		coffeeMaker.makeCoffee(0, -100);
-
 	}
-
 
 	/**
 	 * Test whether the given money is acceptable
@@ -280,11 +320,30 @@ public class CoffeeMakerTest {
 	}
 
 	/**
+	 * Test making a coffee without enough ingredients
+	 */
+	@Test
+	public void testMakeCoffeeWithoutIngredients() throws RecipeException {
+		Recipe testCoffeeIng = createRecipe("Not Enough Beverage Ingredients", "50", "50", "50", "50", "20");
+		coffeeMaker.addRecipe(testCoffeeIng);
+		assertEquals(coffeeMaker.makeCoffee(0, 20), 20);
+
+	}
+
+	/**
+	 * Test giving no recipe to make coffee
+	 */
+	@Test
+	public void testMakeCoffeeWithoutRecipe() {
+		assertEquals(coffeeMaker.makeCoffee(0, 50), 50);
+	}
+
+	/**
 	 * Checking the amount of spent ingredients
 	 */
 	@Test
 	public void testCheckIngredient() {
-		inventory = new Inventory();
+		Inventory inventory = new Inventory();
 		inventory.useIngredients(recipe3);
 
 		assertEquals(inventory.getChocolate(), 15);
