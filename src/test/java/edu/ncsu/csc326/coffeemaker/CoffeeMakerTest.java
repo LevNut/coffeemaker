@@ -19,6 +19,7 @@
 package edu.ncsu.csc326.coffeemaker;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +38,8 @@ public class CoffeeMakerTest {
 	 * The object under test.
 	 */
 	private CoffeeMaker coffeeMaker;
+	private CoffeeMaker mockCoffeeMaker;
+	private RecipeBook stubRecipeBook;
 
 	// Sample recipes to use in testing.
 	private Recipe recipe1;
@@ -54,6 +57,9 @@ public class CoffeeMakerTest {
 	@Before
 	public void setUp() throws RecipeException {
 		coffeeMaker = new CoffeeMaker();
+
+		stubRecipeBook = mock(RecipeBook.class);
+		mockCoffeeMaker = new CoffeeMaker(stubRecipeBook, new Inventory());
 
 		//Set up for all recipes
 		recipe1 = createRecipe("Coffee", "0", "3", "1", "1", "50");
@@ -264,17 +270,24 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testMakeCoffee() {
-		coffeeMaker.addRecipe(recipe1);
-		assertEquals(25, coffeeMaker.makeCoffee(0, 75));
+		Recipe[] recipesArr = new Recipe[] {recipe1};
+		when(stubRecipeBook.getRecipes()).thenReturn(recipesArr);
+
+		assertEquals(25, mockCoffeeMaker.makeCoffee(0, 75));
+
+		verify(stubRecipeBook, times(4)).getRecipes();
 	}
 
 	/**
 	 * Test the negative purchasing the beverage
 	 */
-	@Test (expected = Exception.class)
+	@Test
 	public void testMakeCoffeeByNegativeInteger() {
-		coffeeMaker.addRecipe(recipe3);
-		coffeeMaker.makeCoffee(0, -100);
+		Recipe[] recipesArr = new Recipe[] {recipe3};
+		when(stubRecipeBook.getRecipes()).thenReturn(recipesArr);
+
+		assertEquals(-100, mockCoffeeMaker.makeCoffee(0, -100));
+		verify(stubRecipeBook, times(2)).getRecipes();
 	}
 
 	/**
@@ -282,8 +295,11 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testMakeCoffeeWithoutRightAmountOfMoney() {
-		coffeeMaker.addRecipe(recipe2);
-		assertEquals(coffeeMaker.makeCoffee(0, 50), 50);
+		Recipe[] recipesArr = new Recipe[] {recipe2};
+		when(stubRecipeBook.getRecipes()).thenReturn(recipesArr);
+
+		assertEquals(mockCoffeeMaker.makeCoffee(0, 50), 50);
+		verify(stubRecipeBook, times(2)).getRecipes();
 
 	}
 
@@ -293,8 +309,11 @@ public class CoffeeMakerTest {
 	@Test
 	public void testMakeCoffeeWithoutIngredients() throws RecipeException {
 		Recipe testCoffeeIng = createRecipe("Not Enough Beverage Ingredients", "50", "50", "50", "50", "20");
-		coffeeMaker.addRecipe(testCoffeeIng);
-		assertEquals(coffeeMaker.makeCoffee(0, 20), 20);
+		Recipe[] recipesArr = new Recipe[] {testCoffeeIng};
+		when(stubRecipeBook.getRecipes()).thenReturn(recipesArr);
+
+		assertEquals(mockCoffeeMaker.makeCoffee(0, 20), 20);
+		verify(stubRecipeBook, times(3)).getRecipes();
 
 	}
 
@@ -303,7 +322,7 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testMakeCoffeeWithoutRecipe() {
-		assertEquals(coffeeMaker.makeCoffee(0, 50), 50);
+		assertEquals(50, coffeeMaker.makeCoffee(0, 50));
 	}
 
 	/**
@@ -318,5 +337,21 @@ public class CoffeeMakerTest {
 		assertEquals(inventory.getCoffee(), 12);
 		assertEquals(inventory.getMilk(), 12);
 		assertEquals(inventory.getSugar(), 14);
+	}
+
+
+	/**
+	 * Test if the method makeCoffee() calls getRecipes() and calls addRecipe() or not
+	 */
+	@Test
+	public void testMockMakeCoffeeGetRecipes() {
+		Recipe[] recipesArr = new Recipe[] {recipe1, recipe2, recipe3};
+		when(stubRecipeBook.getRecipes()).thenReturn(recipesArr);
+
+		assertEquals(0, mockCoffeeMaker.makeCoffee(0, 50));
+		verify(stubRecipeBook, times(4)).getRecipes();
+		verify(stubRecipeBook, never()).addRecipe(recipe1);
+		verify(stubRecipeBook, never()).addRecipe(recipe2);
+		verify(stubRecipeBook, never()).addRecipe(recipe3);
 	}
 }
